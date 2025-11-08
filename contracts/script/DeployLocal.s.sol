@@ -23,6 +23,8 @@ contract DeployLocal is Script {
         address donor;
     }
 
+    address constant OWNER0 = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266; // anvil account[0]
+
     function run() external {
         uint256 pk = vm.envOr("PRIVATE_KEY", uint256(0));
         require(pk != 0, "PRIVATE_KEY env required");
@@ -31,19 +33,19 @@ contract DeployLocal is Script {
 
         vm.startBroadcast(pk);
 
-        // Deploy core tokens
-        EduCoin edu = new EduCoin(acc.deployer, 0);
-        EduStar star = new EduStar(acc.deployer, 0);
+        // Deploy core tokens owned by OWNER0
+        EduCoin edu = new EduCoin(OWNER0, 0);
+        EduStar star = new EduStar(OWNER0, 0);
 
-        // Deploy treasury and set threshold
-        EduDonationTreasury treasury = new EduDonationTreasury(acc.deployer, 1 ether);
+        // Deploy treasury (owned by OWNER0) and set threshold
+        EduDonationTreasury treasury = new EduDonationTreasury(OWNER0, 1 ether);
 
-        // Deploy staking vault, wire donation sink to treasury
+        // Deploy staking vault (owned by OWNER0), wire donation sink to treasury
         EduCoinStakingVault vault = new EduCoinStakingVault(
             IERC20(address(edu)),
             "EduCoin Staking Vault",
             "eEDU",
-            acc.deployer,
+            OWNER0,
             600,        // 6% APR
             2500,       // 25% donation split
             60 days,
@@ -56,6 +58,11 @@ contract DeployLocal is Script {
 
         // Deploy task registry (uses EDU)
         TaskRegistry registry = new TaskRegistry(IERC20(address(edu)));
+
+        // Mint large balances to OWNER0 for easier testing
+        edu.mint(OWNER0, 1_000_000 ether);
+        // EduStar uses roles; OWNER0 has MINTER role by construction
+        star.mint(OWNER0, 100_000 ether);
 
         // Seed accounts with EDU and ETH
         _seedAccounts(edu, acc);
