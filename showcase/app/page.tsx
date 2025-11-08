@@ -1,6 +1,6 @@
 import AddressesBar from "./components/AddressesBar";
 import WalletList from "./components/WalletList";
-import StakingMock from "./components/StakingMock";
+import Staking from "./components/Staking";
 import TreasuryMock from "./components/TreasuryMock";
 import TasksMock from "./components/TasksMock";
 import Connect from "./components/Connect";
@@ -19,7 +19,7 @@ export default function Home() {
         <AddressesBar />
         <LiveContracts />
         <WalletList />
-        <StakingMock />
+        <Staking />
         <TreasuryMock />
         <TasksMock />
       </main>
