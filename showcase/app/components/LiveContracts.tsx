@@ -55,18 +55,18 @@ export default function LiveContracts() {
         <div className="rounded-md border border-black/10 dark:border-white/10 p-3">
           <div className="font-medium mb-2">EduCoin</div>
           <div>Name: {(eduName.data as string) || "-"}</div>
-          <div>Balance: {eduBal.data ? (eduBal.data as bigint).toString() : "-"}</div>
+          <div>Balance: {eduBal.data === undefined ? "-" : (eduBal.data as bigint).toString()}</div>
         </div>
         <div className="rounded-md border border-black/10 dark:border-white/10 p-3">
           <div className="font-medium mb-2">EduStar</div>
           <div>Name: {(starName.data as string) || "-"}</div>
-          <div>Balance: {starBal.data ? (starBal.data as bigint).toString() : "-"}</div>
+          <div>Balance: {starBal.data === undefined ? "-" : (starBal.data as bigint).toString()}</div>
         </div>
         <div className="rounded-md border border-black/10 dark:border-white/10 p-3">
           <div className="font-medium mb-2">Vault & Treasury</div>
-          <div>APR (bps): {rate.data ? (rate.data as bigint).toString() : "-"}</div>
-          <div>Donation Split (bps): {split.data ? (split.data as bigint).toString() : "-"}</div>
-          <div>Treasury Threshold (wei): {threshold.data ? (threshold.data as bigint).toString() : "-"}</div>
+          <div>APR (bps): {rate.data === undefined ? "-" : (rate.data as bigint).toString()}</div>
+          <div>Donation Split (bps): {split.data === undefined ? "-" : (split.data as bigint).toString()}</div>
+          <div>Treasury Threshold (wei): {threshold.data === undefined ? "-" : (threshold.data as bigint).toString()}</div>
         </div>
       </div>
       <div className="text-xs text-zinc-500 mt-2">
