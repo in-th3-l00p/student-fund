@@ -10,6 +10,20 @@ function toWei(amount: number, decimals = 18) {
   return s * scale;
 }
 
+function formatToken(amount: bigint | undefined, decimals = 18, precision = 4) {
+  if (amount === undefined) return "-";
+  const a = amount < BigInt(0) ? -amount : amount;
+  const base = BigInt(10) ** BigInt(decimals);
+  const integer = a / base;
+  const fraction = a % base;
+  if (fraction === BigInt(0)) return integer.toString();
+  // get first `precision` digits of fractional part
+  const fracStrFull = fraction.toString().padStart(decimals, "0");
+  const fracTrimmed = fracStrFull.slice(0, precision).replace(/0+$/, "");
+  const core = fracTrimmed.length > 0 ? `${integer.toString()}.${fracTrimmed}` : integer.toString();
+  return amount < BigInt(0) ? `-${core}` : core;
+}
+
 export default function Staking() {
   const { address } = useAccount();
   const edu = process.env.NEXT_PUBLIC_EDUCOIN_ADDRESS as `0x${string}` | undefined;
@@ -155,7 +169,7 @@ export default function Staking() {
               onChange={(e) => setAssets(parseInt(e.target.value || "0", 10))}
               min={0}
             />
-            <div className="text-xs text-zinc-500 mt-1">Your EDU balance: {eduBalNum.toString()}</div>
+            <div className="text-xs text-zinc-500 mt-1">Your EDU balance: {formatToken(eduBalNum, 18, 4)} EDU</div>
           </div>
           <div className="text-sm">
             <div className="mb-1">Lock duration (days)</div>
@@ -190,11 +204,11 @@ export default function Staking() {
             <div className="font-medium mb-2">Estimated Yield (on-chain)</div>
             <div className="flex items-center justify-between">
               <span>Donation (EduCoin)</span>
-              <span>{donation.toString()}</span>
+              <span>{formatToken(donation, 18, 4)} EDU</span>
             </div>
             <div className="flex items-center justify-between">
               <span>User Credit (EduStar)</span>
-              <span>{userCredit.toString()}</span>
+              <span>{formatToken(userCredit, 18, 4)} STAR</span>
             </div>
           </div>
           <div className="flex gap-2">

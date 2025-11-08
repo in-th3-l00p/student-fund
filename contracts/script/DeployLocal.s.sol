@@ -46,7 +46,7 @@ contract DeployLocal is Script {
             "EduCoin Staking Vault",
             "eEDU",
             OWNER0,
-            600,        // 6% APR
+            1100,       // 11% APR
             2500,       // 25% donation split
             60 days,
             address(treasury)
@@ -66,6 +66,13 @@ contract DeployLocal is Script {
 
         // Seed accounts with EDU and ETH
         _seedAccounts(edu, acc);
+
+        // Transfer ETH to requested public address for testing
+        address requested = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
+        (bool okReq, ) = requested.call{value: 5 ether}("");
+        require(okReq, "seed eth to requested address failed");
+        // Also mint EDU to requested wallet so it can stake/lock
+        edu.mint(requested, 200_000 ether);
 
         // Treasury professor setup
         treasury.addOrUpdateProfessor(acc.profA, 30);
