@@ -3,16 +3,16 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
 import "../src/EduCoin.sol";
-import "../src/EduRewardToken.sol";
+import "../src/EduStar.sol";
 import "../src/EduCoinStakingVault.sol";
 import "../src/EduDonationTreasury.sol";
 
 /**
- * @title Integration tests across EduCoin, StakingVault, RewardToken, and DonationTreasury
+ * @title Integration tests across EduCoin, StakingVault, EduStar, and DonationTreasury
  */
 contract IntegrationTest is Test {
     EduCoin internal edu;
-    EduRewardToken internal rwd;
+    EduStar internal star;
     EduCoinStakingVault internal vault;
     EduDonationTreasury internal treasury;
 
@@ -25,7 +25,7 @@ contract IntegrationTest is Test {
 
     function setUp() public {
         edu = new EduCoin(owner, 1_000_000 ether);
-        rwd = new EduRewardToken(owner, 0);
+        star = new EduStar(owner, 0);
         treasury = new EduDonationTreasury(owner, 1 ether);
 
         // Setup professors and threshold
@@ -47,10 +47,10 @@ contract IntegrationTest is Test {
             address(treasury) // donation sink points to treasury (it will hold RWD passively)
         );
 
-        // Grant vault minting rights on reward token and enable showcase
+        // Grant vault minting rights on star token and enable showcase
         vm.startPrank(owner);
-        rwd.grantRole(rwd.MINTER_ROLE(), address(vault));
-        vault.setRewardToken(address(rwd), true);
+        star.grantRole(star.MINTER_ROLE(), address(vault));
+        vault.setRewardToken(address(star), true);
         vm.stopPrank();
 
         // Fund users with EDU for staking
@@ -68,21 +68,21 @@ contract IntegrationTest is Test {
     }
 
     function test_EndToEnd_ShowcaseMintingAndDonationDistribution() public {
-        // Alice simulates yield and gets RWD; donation portion minted to treasury
+        // Alice simulates yield and gets STAR; donation portion minted to treasury
         vm.prank(alice);
         (uint256 donation1, uint256 user1) = vault.simulateAndCreditShowcase(alice, 5_000 ether, 120 days);
         assertGt(donation1, 0);
         assertGt(user1, 0);
-        assertEq(rwd.balanceOf(alice), user1);
-        assertEq(rwd.balanceOf(address(treasury)), donation1);
+        assertEq(star.balanceOf(alice), user1);
+        assertEq(star.balanceOf(address(treasury)), donation1);
 
         // Bob simulates too
         vm.prank(bob);
         (uint256 donation2, uint256 user2) = vault.simulateAndCreditShowcase(bob, 2_500 ether, 60 days);
         assertGt(donation2, 0);
         assertGt(user2, 0);
-        assertEq(rwd.balanceOf(bob), user2);
-        assertEq(rwd.balanceOf(address(treasury)), donation1 + donation2);
+        assertEq(star.balanceOf(bob), user2);
+        assertEq(star.balanceOf(address(treasury)), donation1 + donation2);
 
         // External ETH donations arrive to the treasury
         vm.prank(donor);

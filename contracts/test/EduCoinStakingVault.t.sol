@@ -3,13 +3,13 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
 import "../src/EduCoin.sol";
-import "../src/EduRewardToken.sol";
+import "../src/EduStar.sol";
 import "../src/EduCoinStakingVault.sol";
 
 contract EduCoinStakingVaultTest is Test {
     EduCoin internal edu;
     EduCoinStakingVault internal vault;
-    EduRewardToken internal rwd;
+    EduStar internal star;
 
     address internal owner = address(0x1001);
     address internal user = address(0x2002);
@@ -53,11 +53,11 @@ contract EduCoinStakingVaultTest is Test {
 
     function test_EstimateAndShowcase_MintsRewardToken() public {
         // Deploy reward token and enable showcase mode
-        rwd = new EduRewardToken(owner, 0);
+        star = new EduStar(owner, 0);
         vm.startPrank(owner);
         // grant vault MINTER_ROLE
-        rwd.grantRole(rwd.MINTER_ROLE(), address(vault));
-        vault.setRewardToken(address(rwd), true);
+        star.grantRole(star.MINTER_ROLE(), address(vault));
+        vault.setRewardToken(address(star), true);
         vm.stopPrank();
 
         // Simulate 1000 EDU for 90 days
@@ -67,8 +67,8 @@ contract EduCoinStakingVaultTest is Test {
         assertGt(userCredited, 0);
 
         // Donation minted to donationSink; user credited minted to user
-        assertEq(rwd.balanceOf(donationSink), donationAmount);
-        assertEq(rwd.balanceOf(user), userCredited);
+        assertEq(star.balanceOf(donationSink), donationAmount);
+        assertEq(star.balanceOf(user), userCredited);
         assertEq(vault.showcaseBalances(user), userCredited);
     }
 }

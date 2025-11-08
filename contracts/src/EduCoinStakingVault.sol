@@ -8,7 +8,7 @@ import {ReentrancyGuard} from "@openzeppelin-contracts-5.5.0/utils/ReentrancyGua
 import {Math} from "@openzeppelin-contracts-5.5.0/utils/math/Math.sol";
 
 import {EduCoin} from "./EduCoin.sol";
-import {EduRewardToken} from "./EduRewardToken.sol";
+import {EduStar} from "./EduStar.sol";
 
 /**
  * @title EduCoinStakingVault
@@ -47,7 +47,7 @@ contract EduCoinStakingVault is ERC4626, Ownable, ReentrancyGuard {
     // -------------------------
     // Showcase minting (optional)
     // -------------------------
-    EduRewardToken public rewardToken; // optional; if set, can mint showcase rewards
+    EduStar public rewardToken; // optional; if set, can mint showcase rewards
     bool public showcaseModeEnabled;
 
     // For frontends that want to display "virtual" balances without minting a token.
@@ -258,7 +258,7 @@ contract EduCoinStakingVault is ERC4626, Ownable, ReentrancyGuard {
     }
 
     function setRewardToken(address token, bool enabled) external onlyOwner {
-        rewardToken = EduRewardToken(token);
+        rewardToken = EduStar(token);
         showcaseModeEnabled = enabled;
         emit RewardTokenSet(token, enabled);
     }
