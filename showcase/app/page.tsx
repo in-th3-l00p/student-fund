@@ -3,6 +3,8 @@ import WalletList from "./components/WalletList";
 import StakingMock from "./components/StakingMock";
 import TreasuryMock from "./components/TreasuryMock";
 import TasksMock from "./components/TasksMock";
+import Connect from "./components/Connect";
+import LiveContracts from "./components/LiveContracts";
 
 export default function Home() {
   return (
@@ -10,11 +12,12 @@ export default function Home() {
       <header className="w-full border-b border-black/10 dark:border-white/10">
         <div className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
           <div className="text-xl font-semibold">EduChain Showcase (Mock)</div>
-          <div className="text-sm text-zinc-500">No blockchain calls — purely simulated</div>
+          <Connect />
         </div>
       </header>
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-6">
         <AddressesBar />
+        <LiveContracts />
         <WalletList />
         <StakingMock />
         <TreasuryMock />

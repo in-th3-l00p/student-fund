@@ -31,12 +31,29 @@ sleep 1
 echo "Anvil PID: $ANVIL_PID"
 
 if [[ -z "$PRIVATE_KEY" ]]; then
+  # First try: derive with cast (if installed)
   if command -v cast >/dev/null 2>&1; then
     DERIVED_PK=$(cast wallet private-key --mnemonic "$MNEMONIC" --derivation-path "m/44'/60'/0'/0/0" 2>/dev/null || true)
     if [[ -n "${DERIVED_PK:-}" ]]; then
       PRIVATE_KEY="$DERIVED_PK"
-      echo "Derived PRIVATE_KEY for deployer from mnemonic."
+      echo "Derived PRIVATE_KEY using cast."
     fi
+  fi
+fi
+
+if [[ -z "$PRIVATE_KEY" ]]; then
+  # Second try: parse from anvil log output
+  # Wait briefly for anvil to finish printing keys
+  for i in {1..10}; do
+    if grep -qE "0x[0-9a-fA-F]{64}" "$ANVIL_LOG"; then
+      break
+    fi
+    sleep 0.3
+  done
+  DERIVED_PK_LOG="$(grep -Eo '0x[0-9a-fA-F]{64}' "$ANVIL_LOG" | head -n1 || true)"
+  if [[ -n "${DERIVED_PK_LOG:-}" ]]; then
+    PRIVATE_KEY="$DERIVED_PK_LOG"
+    echo "Derived PRIVATE_KEY from anvil output."
   fi
 fi
 

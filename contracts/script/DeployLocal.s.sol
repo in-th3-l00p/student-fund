@@ -3,7 +3,6 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
 import "forge-std/console2.sol";
-import "forge-std/StdJson.sol";
 
 import {IERC20} from "@openzeppelin-contracts-5.5.0/token/ERC20/IERC20.sol";
 
@@ -14,7 +13,6 @@ import {EduDonationTreasury} from "../src/EduDonationTreasury.sol";
 import {TaskRegistry} from "../src/TaskRegistry.sol";
 
 contract DeployLocal is Script {
-    using stdJson for string;
 
     struct Accounts {
         address deployer;
@@ -117,25 +115,7 @@ contract DeployLocal is Script {
         TaskRegistry registry,
         Accounts memory acc
     ) internal {
-        string memory json;
-        string memory pathJson = string.concat(vm.projectRoot(), "/contracts/deployments/local.json");
-        string memory pathEnv = string.concat(vm.projectRoot(), "/contracts/deployments/local.env");
-
-        json = json.serialize("contracts", "edu", address(edu));
-        json = json.serialize("contracts", "edustar", address(star));
-        json = json.serialize("contracts", "vault", address(vault));
-        json = json.serialize("contracts", "treasury", address(treasury));
-        json = json.serialize("contracts", "taskRegistry", address(registry));
-
-        json = json.serialize("accounts", "deployer", acc.deployer);
-        json = json.serialize("accounts", "alice", acc.alice);
-        json = json.serialize("accounts", "bob", acc.bob);
-        json = json.serialize("accounts", "profA", acc.profA);
-        json = json.serialize("accounts", "profB", acc.profB);
-        json = json.serialize("accounts", "donor", acc.donor);
-
-        // Write JSON
-        vm.writeJson(json, pathJson);
+        string memory pathEnv = string.concat(vm.projectRoot(), "/deployments/local.env");
 
         // Write .env
         string memory env = string.concat(
