@@ -40,7 +40,11 @@ export const vaultAbi = [
 
 export const treasuryAbi = [
   { type: "function", name: "distributionThreshold", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
+  { type: "function", name: "owner", stateMutability: "view", inputs: [], outputs: [{ type: "address" }] },
   { type: "function", name: "getProfessors", stateMutability: "view", inputs: [], outputs: [{ type: "address[]" }] },
+  { type: "function", name: "donate", stateMutability: "payable", inputs: [], outputs: [] },
+  { type: "function", name: "distribute", stateMutability: "nonpayable", inputs: [], outputs: [] },
+  { type: "function", name: "addOrUpdateProfessor", stateMutability: "nonpayable", inputs: [{ type: "address" }, { type: "uint256" }], outputs: [] },
 ] as const;
 
 export const taskRegistryAbi = [
@@ -61,6 +65,18 @@ export const taskRegistryAbi = [
       { type: "uint256" },
     ],
   },
+  { type: "function", name: "tasksCount", stateMutability: "view", inputs: [], outputs: [{ type: "uint256" }] },
+  {
+    type: "function",
+    name: "createTask",
+    stateMutability: "nonpayable",
+    inputs: [{ type: "string" }, { type: "string" }, { type: "uint256" }, { type: "uint256" }, { type: "uint256" }, { type: "uint64" }],
+    outputs: [{ type: "uint256" }],
+  },
+  { type: "function", name: "joinTask", stateMutability: "nonpayable", inputs: [{ type: "uint256" }, { type: "uint256" }], outputs: [] },
+  { type: "function", name: "submitWork", stateMutability: "nonpayable", inputs: [{ type: "uint256" }, { type: "string" }], outputs: [] },
+  { type: "function", name: "reviewSubmission", stateMutability: "nonpayable", inputs: [{ type: "uint256" }, { type: "address" }, { type: "uint8" }], outputs: [] },
+  { type: "function", name: "settleTask", stateMutability: "nonpayable", inputs: [{ type: "uint256" }], outputs: [] },
 ] as const;
 
 

@@ -1,8 +1,8 @@
 import AddressesBar from "./components/AddressesBar";
 import WalletList from "./components/WalletList";
 import Staking from "./components/Staking";
-import TreasuryMock from "./components/TreasuryMock";
-import TasksMock from "./components/TasksMock";
+import Treasury from "./components/Treasury";
+import Tasks from "./components/Tasks";
 import Connect from "./components/Connect";
 import LiveContracts from "./components/LiveContracts";
 
@@ -20,8 +20,8 @@ export default function Home() {
         <LiveContracts />
         <WalletList />
         <Staking />
-        <TreasuryMock />
-        <TasksMock />
+        <Treasury />
+        <Tasks />
       </main>
       <footer className="max-w-6xl mx-auto px-6 py-8 text-xs text-zinc-500">
         Tip: Once ready, wire these panels to real contracts using the addresses shown above.
