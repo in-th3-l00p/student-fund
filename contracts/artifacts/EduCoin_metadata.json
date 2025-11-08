@@ -576,7 +576,8 @@
 		},
 		"remappings": [
 			":@openzeppelin-contracts-5.5.0/=dependencies/@openzeppelin-contracts-5.5.0/",
-			":forge-std-1.11.0/=dependencies/forge-std-1.11.0/"
+			":forge-std-1.11.0/=dependencies/forge-std-1.11.0/",
+			":forge-std/=dependencies/forge-std-1.11.0/src/"
 		]
 	},
 	"sources": {

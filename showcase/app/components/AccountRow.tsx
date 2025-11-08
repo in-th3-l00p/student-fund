@@ -7,13 +7,15 @@ type Props = {
   address: `0x${string}`;
   edu?: `0x${string}`;
   star?: `0x${string}`;
+  eduBalance?: bigint;
+  starBalance?: bigint;
 };
 
 function short(addr: string) {
   return addr.length > 10 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
 }
 
-export default function AccountRow({ label, address, edu, star }: Props) {
+export default function AccountRow({ label, address, edu, star, eduBalance, starBalance }: Props) {
   const eth = useBalance({ address });
   const eduBal = useReadContract({
     address: edu,
@@ -29,6 +31,8 @@ export default function AccountRow({ label, address, edu, star }: Props) {
     args: [address],
     query: { enabled: !!star },
   });
+  const eduValue = eduBalance ?? (eduBal.data as bigint | undefined);
+  const starValue = starBalance ?? (starBal.data as bigint | undefined);
 
   return (
     <div className="rounded-md border border-black/10 dark:border-white/10 p-3">
@@ -43,11 +47,11 @@ export default function AccountRow({ label, address, edu, star }: Props) {
         </div>
         <div>
           <div className="text-zinc-500">EDU</div>
-          <div>{eduBal.data === undefined ? "-" : (eduBal.data as bigint).toString()}</div>
+          <div>{eduValue === undefined ? "-" : eduValue.toString()}</div>
         </div>
         <div>
           <div className="text-zinc-500">STAR</div>
-          <div>{starBal.data === undefined ? "-" : (starBal.data as bigint).toString()}</div>
+          <div>{starValue === undefined ? "-" : starValue.toString()}</div>
         </div>
       </div>
     </div>
