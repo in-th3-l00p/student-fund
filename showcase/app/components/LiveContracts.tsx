@@ -3,19 +3,18 @@
 import { useAccount, useReadContract } from "wagmi";
 import { erc20Abi, vaultAbi, treasuryAbi } from "../lib/abis";
 
-function addr(name: string): `0x${string}` | undefined {
-  const v = process.env[name];
+function envAddress(v: string | undefined): `0x${string}` | undefined {
   if (!v) return undefined;
-  if (v.startsWith("0x")) return v as `0x${string}`;
-  return undefined;
+  return v.startsWith("0x") ? (v as `0x${string}`) : undefined;
 }
 
 export default function LiveContracts() {
   const { address } = useAccount();
-  const edu = addr("NEXT_PUBLIC_EDUCOIN_ADDRESS");
-  const star = addr("NEXT_PUBLIC_EDUSTAR_ADDRESS");
-  const vault = addr("NEXT_PUBLIC_VAULT_ADDRESS");
-  const treasury = addr("NEXT_PUBLIC_DONATION_TREASURY_ADDRESS");
+
+  const edu = envAddress(process.env.NEXT_PUBLIC_EDUCOIN_ADDRESS);
+  const star = envAddress(process.env.NEXT_PUBLIC_EDUSTAR_ADDRESS);
+  const vault = envAddress(process.env.NEXT_PUBLIC_VAULT_ADDRESS);
+  const treasury = envAddress(process.env.NEXT_PUBLIC_DONATION_TREASURY_ADDRESS);
 
   const eduName = useReadContract({ address: edu, abi: erc20Abi, functionName: "name", query: { enabled: !!edu } });
   const eduBal = useReadContract({
@@ -55,12 +54,12 @@ export default function LiveContracts() {
       <div className="grid gap-3 md:grid-cols-3 text-sm">
         <div className="rounded-md border border-black/10 dark:border-white/10 p-3">
           <div className="font-medium mb-2">EduCoin</div>
-          <div>Name: {eduName.data as string || "-"}</div>
+          <div>Name: {(eduName.data as string) || "-"}</div>
           <div>Balance: {eduBal.data ? (eduBal.data as bigint).toString() : "-"}</div>
         </div>
         <div className="rounded-md border border-black/10 dark:border-white/10 p-3">
           <div className="font-medium mb-2">EduStar</div>
-          <div>Name: {starName.data as string || "-"}</div>
+          <div>Name: {(starName.data as string) || "-"}</div>
           <div>Balance: {starBal.data ? (starBal.data as bigint).toString() : "-"}</div>
         </div>
         <div className="rounded-md border border-black/10 dark:border-white/10 p-3">
@@ -76,5 +75,3 @@ export default function LiveContracts() {
     </div>
   );
 }
-
-
