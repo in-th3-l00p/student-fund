@@ -1,55 +1,60 @@
-type DemoAccount = { label: string; address: string; edu?: number; star?: number; eth?: number };
+"use client";
+import { useMemo } from "react";
+import { useAccount, useReadContract } from "wagmi";
+import { treasuryAbi } from "../lib/abis";
+import AccountRow from "./AccountRow";
 
-function parseDemoAccounts(): DemoAccount[] {
-  try {
-    const raw = process.env.NEXT_PUBLIC_DEMO_ACCOUNTS_JSON;
-    if (raw) {
-      // Allow either raw JSON or a quoted JSON string
-      const trimmed = raw.startsWith("'") || raw.startsWith('"') ? raw.slice(1, -1) : raw;
-      const parsed = JSON.parse(trimmed) as DemoAccount[];
-      return parsed.map((a) => ({ edu: 0, star: 0, eth: 0, ...a }));
-    }
-  } catch {}
-  return [
-    { label: "Deployer", address: "0xDepl0yer...", edu: 0, star: 0, eth: 0 },
-    { label: "Alice", address: "0xA1ice...", edu: 20000, star: 0, eth: 5 },
-    { label: "Bob", address: "0xB0b...", edu: 10000, star: 0, eth: 5 },
-    { label: "ProfA", address: "0xPr0fA...", edu: 1000, star: 0, eth: 1 },
-    { label: "ProfB", address: "0xPr0fB...", edu: 1000, star: 0, eth: 1 },
-  ];
+type ChainAccount = { label: string; address: `0x${string}` };
+
+function envAddress(v: string | undefined): `0x${string}` | undefined {
+  if (!v) return undefined;
+  return v.startsWith("0x") ? (v as `0x${string}`) : undefined;
+}
+
+function short(addr: string) {
+  return addr.length > 10 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
 }
 
 export default function WalletList() {
-  const accounts = parseDemoAccounts();
+  const { address: connected } = useAccount();
+  const edu = envAddress(process.env.NEXT_PUBLIC_EDUCOIN_ADDRESS);
+  const star = envAddress(process.env.NEXT_PUBLIC_EDUSTAR_ADDRESS);
+  const treasury = envAddress(process.env.NEXT_PUBLIC_DONATION_TREASURY_ADDRESS);
+
+  // Fetch professor addresses from the on-chain treasury registry
+  const profs = useReadContract({
+    address: treasury,
+    abi: treasuryAbi,
+    functionName: "getProfessors",
+    query: { enabled: !!treasury },
+  });
+
+  // Build the list: connected user (if any) + professors from chain (unique)
+  const accounts: ChainAccount[] = useMemo(() => {
+    const list: ChainAccount[] = [];
+    if (connected) list.push({ label: "You", address: connected as `0x${string}` });
+    const arr = (profs.data as `0x${string}`[] | undefined) || [];
+    arr.forEach((addr, idx) => {
+      if (!addr) return;
+      if (list.some((a) => a.address.toLowerCase() === addr.toLowerCase())) return;
+      list.push({ label: `Professor #${idx + 1}`, address: addr });
+    });
+    return list;
+  }, [connected, profs.data]);
+
   return (
     <div className="w-full rounded-lg border border-black/10 dark:border-white/10 p-4">
-      <div className="font-semibold mb-3">Demo Wallets</div>
+      <div className="font-semibold mb-3">Wallets on Chain</div>
       <div className="grid gap-3 md:grid-cols-2">
         {accounts.map((a) => (
-          <div key={a.address} className="rounded-md border border-black/10 dark:border-white/10 p-3">
-            <div className="flex items-center justify-between">
-              <div className="font-medium">{a.label}</div>
-              <div className="text-xs text-zinc-500">{a.address}</div>
-            </div>
-            <div className="mt-2 grid grid-cols-3 text-sm">
-              <div>
-                <div className="text-zinc-500">ETH</div>
-                <div>{a.eth ?? 0}</div>
-              </div>
-              <div>
-                <div className="text-zinc-500">EDU</div>
-                <div>{a.edu ?? 0}</div>
-              </div>
-              <div>
-                <div className="text-zinc-500">STAR</div>
-                <div>{a.star ?? 0}</div>
-              </div>
-            </div>
-          </div>
+          <AccountRow key={a.address} label={a.label} address={a.address} edu={edu} star={star} />
         ))}
+        {accounts.length === 0 && (
+          <div className="text-sm text-zinc-500">
+            Connect a wallet to view balances and ensure the Treasury has registered professors.
+          </div>
+        )}
       </div>
     </div>
   );
 }
-
-
